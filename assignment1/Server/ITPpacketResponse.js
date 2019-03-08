@@ -68,7 +68,7 @@ module.exports = {
         console.log({fileName});
 
 
-        // if the filename got truncated, try searching the key parts
+        // if the filename got truncated, try searching the to see if we can get a partial match
         if(!fileName) {
             console.log('trying backup filenames');
             let potentialFiles = ["Swan", "Cardinal", "Flamingo", "Flicker", "Parrot"];

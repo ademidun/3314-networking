@@ -21,7 +21,7 @@ module.exports = {
         console.log({image});
         let packet = new Buffer.alloc(12);
 
-
+        // enter the course number, version number and request type as ITP packet headers
         packet.writeIntBE(3314,0,3);
         packet.writeIntBE(1,3,1);
         packet.write(image,4,12);

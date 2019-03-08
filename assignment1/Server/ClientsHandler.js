@@ -16,6 +16,7 @@ module.exports = {
         });
 
         function readRespond(data) {
+            // process the response from the cleint and prepare a response using our ITPpacket.
             console.log('DATA: ' + sock.remoteAddress + ': ' + data);
             sock.write(ITPpacket.getPacket(singleton.getSequenceNumber(), singleton.getTimestamp(), data));
         }

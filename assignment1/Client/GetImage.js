@@ -7,7 +7,7 @@ var minimist = require('minimist')
 // Enter your code for the client functionality here
 // Consider the code given iin unit 7 slide 40 as a base and build upon it
 
-// node GetImage.js -s 127.0.0.1:3000 -q cardinal.jpg -v 4
+// node GetImage.js -s 127.0.0.1:3000 -q swan.jpg -v 4
 
 var HOST = '127.0.0.1';
 var PORT = 3000;
@@ -17,6 +17,7 @@ var client = new net.Socket();
 
 let args = minimist(process.argv);
 
+// parse the arguements used to specify the image we are querying
 let image = args['q'];
 console.log({args});
 
@@ -32,6 +33,9 @@ client.connect(PORT, HOST, function () {
 });
 
 client.on('data', function (data) {
+
+    //read the image sent from the client with the image stored as a binary payload in buf2;
+
 
     let bufferSize = data.byteLength;
     let packetResponse0 = data.readIntLE(0, 3);
