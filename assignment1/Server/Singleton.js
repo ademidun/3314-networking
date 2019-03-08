@@ -11,14 +11,40 @@ module.exports = {
     //--------------------------
     getSequenceNumber: function() {
       // Enter your code here //
-        return "this should be a correct sequence number";
+        var sequenceNumber=0;
+        var min =1;
+        var max =999;
+
+        if (sequenceNumber == 0)
+        {
+            sequenceNumber = Math.floor(Math.random()* (+max - +min)) + +min;
+        }
+
+        else {
+            sequenceNumber++;
+        }
+
+        return sequenceNumber;
     },
 
     //--------------------------
     //getTimestamp: return the current timer value
     //--------------------------
-    getTimestamp() {
-        return Date.now();
+    getTimestamp: () => {
+
+        let timeStamp=0;
+        let min =1;
+        let max =999;
+        // let timerInterval = setInterval(timeStamp++, 10);
+
+        if (timeStamp == 0)
+        {
+            timeStamp = Math.floor(Math.random()* (+max - +min)) + +min;
+
+        }
+
+        return timeStamp;
+
     }
 
 

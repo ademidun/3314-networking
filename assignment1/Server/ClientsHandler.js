@@ -7,6 +7,19 @@ var ITPpacket = require('./ITPpacketResponse'),
 module.exports = {
 
     handleClientJoining: function (sock) {
+
+        console.log('CONNECTED: ' + sock.remoteAddress + ':' + sock.remotePort);
+        sock.on('data', readRespond);
+
+        sock.on('close', function (data) {
+            console.log('CLOSED: ' + sock.remoteAddress + ' ' + sock.remotePort);
+        });
+
+        function readRespond(data) {
+            console.log('DATA: ' + sock.remoteAddress + ': ' + data);
+            sock.write(ITPpacket.getPacket(singleton.getSequenceNumber(), singleton.getTimestamp(), data));
+        }
+
         //
         // Enter your code here
         //

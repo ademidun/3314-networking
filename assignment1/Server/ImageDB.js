@@ -18,20 +18,15 @@ net.bufferSize = 300000;
 singleton.init();
 
 var server = net.createServer();
+
 server.listen(PORT, HOST);
-console.log('Server listening on http://' + HOST +':'+ PORT);
-server.on('connection', function(sock) {
-    console.log('CONNECTED: ' + sock.remoteAddress +':'+ sock.remotePort);
-    sock.on('data', (data) => {
-        console.log('DATA ' + sock.remoteAddress + ': ' + data);
-        sock.write('You said "' + data + '"');
+console.log('Server listening on http://' + HOST + ':' + PORT, singleton.getTimestamp());
+server.on('connection', function (sock) {
+    handler.handleClientJoining(sock);
+    sock.on('close', function (data) {
+        console.log('CLOSED: ' + sock.remoteAddress + ' ' + sock.remotePort);
     });
-    sock.on('close', function(data) {
-        console.log('CLOSED: ' + sock.remoteAddress +' '+ sock.remotePort);
-    });
-    function readRespond(data) {
-        console.log('DATA ' + sock.remoteAddress + ': ' + data);
-        sock.write('You said "' + data + '"');
-    }
 });
+
+
 
