@@ -28,7 +28,7 @@ module.exports = {
     //--------------------------
     //getpacket: returns the entire packet
     //--------------------------
-    getPacket: function (seq_num, time_stamp, requestPayload, peerTable) {
+    getPacket: function (seq_num, time_stamp, requestPayload, peerTable, socket) {
 
         let fileName = "";
         let requestPayload1 = requestPayload.readIntLE(0, 3);
@@ -44,6 +44,7 @@ module.exports = {
         console.log({requestPayload3});
 
 
+        /*
         console.log({__dirname});
 
         let imageDirectory = __dirname + "/images";
@@ -80,26 +81,46 @@ module.exports = {
             }
         }
 
-        let fullPacket = Buffer.alloc(16);
-        try {
-            let packetRequest = new Buffer.alloc(16);
+        */
 
-            console.log({fileName});
-            let newBuffer = fs.readFileSync(fileName);
+        let fullPacket = Buffer.alloc(24);
+        try {
+            let packetResponse = new Buffer.alloc(24);
+
+            // console.log({fileName});
+            // let newBuffer = fs.readFileSync(fileName);
+
             let messageType = 1;
             if (peerTable.length > 1) {
                 messageType = 2;
             }
-            packetRequest.writeIntLE(messageType, 0, 3);
-            packetRequest.writeIntLE(1, 3, 1);
-            packetRequest.writeIntLE(seq_num, 4, 4);
-            packetRequest.writeIntLE(time_stamp, 8, 4);
-            packetRequest.writeIntLE(this.getLength(fileName), 12, 4);
+            //todo peerResponse is getting double counted
 
-            let arr = [packetRequest, newBuffer];
+            console.log({peerTable});
+            packetResponse.writeIntLE(messageType, 0, 1);
+            packetResponse.writeIntLE(3314, 1, 3);
+            packetResponse.write
+            (socket.remoteAddress + ':' + socket.remotePort, 4, 4);
+            // senderID todo: how to write string to buffer
+            packetResponse.writeIntLE(peerTable.length, 8, 4); // number of peers
 
-            fullPacket = Buffer.concat(arr);
-            console.log(fullPacket);
+            if (peerTable.length > 0) {
+                let [peerIPAddress, peerPortNumber] = peerTable[peerTable.length-1].split(':');
+                peerPortNumber = parseInt(peerPortNumber);
+
+
+                console.log({peerIPAddress});
+                console.log({peerPortNumber});
+
+                packetResponse.writeIntLE(peerPortNumber, 12, 4); // peer port number
+                // port number is 52917, we need 4 bytes (not 2) to store that
+                // else: RangeError [ERR_OUT_OF_RANGE]: The value of "value" is out of range.
+                // It must be >= -32768 and <= 32767. Received 52917
+                packetResponse.writeIntLE(peerIPAddress, 16, 4); // peer ip adress
+            }
+
+            fullPacket = Buffer.concat([packetResponse]);
+            console.log({fullPacket});
 
         }
         catch (err) {

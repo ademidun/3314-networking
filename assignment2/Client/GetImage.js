@@ -19,7 +19,6 @@ let args = minimist(process.argv);
 
 // parse the arguements used to specify the image we are querying
 let image = args['q'];
-console.log({args});
 
 if (!image) {
     console.log('\nError:Image must be set!\n');
@@ -38,12 +37,14 @@ client.on('data', function (data) {
 
 
     let bufferSize = data.byteLength;
-    let packetResponse0 = data.readIntLE(0, 3);
-    let packetResponse1 = data.readIntLE(3, 1);
-    let packetResponse2 = data.readIntLE(4, 4);
-    let packetResponse3 = data.readIntLE(8, 4);
-    let packetResponse4 = data.readIntLE(12, 4);
+    let packetResponseMessageType = data.readIntLE(0, 1);
+    let packetResponseVersion = data.readIntLE(1, 3);
+    let packetResponseSenderID = data.toString('ascii', 4,8);
+    let packetResponsePeersCount = data.readIntLE(8, 4);
+    let packetResponsePeerPortNumber = data.readIntLE(12, 4);
+    let packetResponsePeerIPAddress = data.readIntLE(16, 4);
 
+    /*
     const buf2 = data.slice(16, bufferSize);
     console.log(buf2);
 
@@ -59,11 +60,14 @@ client.on('data', function (data) {
         // image viewer closed
     });
 
-    console.log(packetResponse0);
-    console.log(packetResponse1);
-    console.log(packetResponse2);
-    console.log(packetResponse3);
-    console.log(packetResponse4);
+    */
+
+    console.log({packetResponseMessageType});
+    console.log({packetResponseVersion});
+    console.log({packetResponseSenderID});
+    console.log({packetResponsePeersCount});
+    console.log({packetResponsePeerPortNumber});
+    console.log({packetResponsePeerIPAddress});
 
 });
 
