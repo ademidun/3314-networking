@@ -15,16 +15,17 @@ module.exports = {
     //--------------------------
     //getpacket: returns the entire packet
     //--------------------------
-    getpacket: function(image) {
+    // getpacket: function(image) {
+    getpacket: function() {
         // enter your code here
 
-        console.log({image});
+        // console.log({image});
         let packet = new Buffer.alloc(16);
 
         // enter the course number, version number and request type as ITP packet headers
         packet.writeIntLE(3314,0,3);
         packet.writeIntLE(1,3,1);
-        packet.write(image,4,12);
+        // packet.write(image,4,12);
 
         let byte0 = packet.readIntLE(0,3);
         let byte3 = packet.readIntLE(3,1);

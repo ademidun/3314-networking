@@ -8,7 +8,7 @@ module.exports = {
 
     handleClientJoining: function (sock,peerTable, redirect=false) {
 
-        console.log('CONNECTED: ' + sock.remoteAddress + ':' + sock.remotePort);
+        console.log('Connected from peer ' + sock.remoteAddress + ':' + sock.remotePort);
         sock.on('data', data => {
 
             if (peerTable.length >= 2 && !redirect) {

@@ -5,10 +5,13 @@ let net = require('net'),
     singleton = require('./Singleton'),
     handler = require('./ClientsHandler');
 var minimist = require('minimist')
+var ITPpacket = require('../Client/ITPpacketRequest')
+
 
 let HOST = '127.0.0.1',
     PORT = 3000;
 let peerTable = [];
+let peersCount = 0;
 // Create a imageDB instance, and chain the listen function to it
 // The function passed to net.createServer() becomes the event handler for the 'connection'
 // event. The sock object the callback function receives UNIQUE for each connection
@@ -25,15 +28,15 @@ let args = minimist(process.argv);
 
 // parse the arguements used to specify the image we are querying
 let peerHost = args['p'];
-console.log(peerHost);
+console.log({peerHost});
 if (peerHost) {
 
     let [peerIPAddress, peerPortNumber] = peerHost.split(':');
 
+    var client = new net.Socket();
+    peersCount += 1;
     client.connect(peerPortNumber, peerIPAddress, function () {
-        console.log('CONNECTED TO: ' + HOST + ':' + PORT);
-        client.write(image);
-        client.write(ITPpacket.getpacket(image));
+        client.write(ITPpacket.getpacket());
     });
 
     client.on('data', function (data) {
@@ -73,6 +76,9 @@ if (peerHost) {
         console.log({packetResponsePeersCount});
         console.log({packetResponsePeerPortNumber});
         console.log({packetResponsePeerIPAddress});
+        console.log(`Connected to peer p1:43945 at timestamp: ${singleton.getTimestamp()}`,
+        `This peer address is ${client.address().address}:${client.address().port}`,
+         `located at p${packetResponsePeersCount+2}`);
 
     });
 
@@ -84,7 +90,8 @@ else {
     var server = net.createServer();
 
     server.listen(PORT, HOST);
-
+    peersCount += 1;
+    console.log(`This peer address is ${HOST}:${PORT} located at p${peersCount}`);
     server.on('connection', function (sock) {
         handler.handleClientJoining(sock, peerTable);
         sock.on('close', function (data) {

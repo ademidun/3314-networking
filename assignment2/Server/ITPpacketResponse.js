@@ -36,12 +36,12 @@ module.exports = {
 
         let requestPayload3 = requestPayload.toString('utf8', 4, 20).toString();
 
-        console.log('requestPayload.toString(\'utf8\', 4, 20).toString()',
-            requestPayload.toString('utf8', 4, 20).toString());
+        // console.log('requestPayload.toString(\'utf8\', 4, 20).toString()',
+        //     requestPayload.toString('utf8', 4, 20).toString());
 
-        console.log({requestPayload1});
-        console.log({requestPayload2});
-        console.log({requestPayload3});
+        // console.log({requestPayload1});
+        // console.log({requestPayload2});
+        // console.log({requestPayload3});
 
 
         /*
@@ -120,7 +120,7 @@ module.exports = {
             }
 
             fullPacket = Buffer.concat([packetResponse]);
-            console.log({fullPacket});
+            // console.log({fullPacket});
 
         }
         catch (err) {
