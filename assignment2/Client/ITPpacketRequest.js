@@ -31,10 +31,14 @@ module.exports = {
         let byte3 = packet.readIntLE(3,1);
         let packetVar = packet.toString('utf8',4,12).toString();
 
+        /*
         console.log('ITPpacketRequest getpacket(image)');
         console.log(byte0);
         console.log(byte3);
         console.log(packetVar);
+
+        */
+
         return packet;
     }
 

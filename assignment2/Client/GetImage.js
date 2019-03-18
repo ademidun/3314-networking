@@ -20,10 +20,6 @@ let args = minimist(process.argv);
 // parse the arguements used to specify the image we are querying
 let image = args['q'];
 
-if (!image) {
-    console.log('\nError:Image must be set!\n');
-    return;
-}
 
 client.connect(PORT, HOST, function () {
     console.log('CONNECTED TO: ' + HOST + ':' + PORT);

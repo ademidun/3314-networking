@@ -23,6 +23,23 @@ net.bufferSize = 300000;
 singleton.init();
 
 let args = minimist(process.argv);
+console.log({args});
+let peerIndex = args['i'];
+let maxPeers = parseInt(args['n']);
+let version = parseInt(args['v']);
+
+if (!peerIndex) {
+    peerIndex = 1
+}
+
+peerIndex = parseInt(peerIndex);
+
+let options = {
+    maxPeers: maxPeers || 2,
+    version: version || 3314,
+};
+
+console.log({options});
 
 // parse the arguements used to specify the image we are querying
 let peerHost = args['p'];
@@ -62,6 +79,7 @@ if (peerHost) {
         let packetResponsePeerPortNumber = data.readIntLE(16, 4);
         let packetResponsePeerIPAddress =  data.toString('ascii', 20, 24);
 
+/*
 
         console.log({packetResponseMessageType});
         console.log({packetResponseVersion});
@@ -70,11 +88,13 @@ if (peerHost) {
         console.log({packetResponsePeerPortNumber});
         console.log({packetResponsePeerIPAddress});
 
+*/
+
 
         console.log(`Connected to peer ${packetResponseSenderID} at timestamp: ${singleton.getTimestamp()}`,
         `\nThis peer address is ${client.address().address}:${client.address().port}`,
-         `located at p${packetResponsePeersCount+2}`);
-        peerId = `p${packetResponsePeersCount+2}:${client.address().port}`;
+         `located at p${peerIndex}`);
+        peerId = `p${peerIndex}:${client.address().port}`;
         //todo: is this the best way to preserve the peerId?
         console.log(`received ACK from ${packetResponseSenderID}`);
 
@@ -94,16 +114,21 @@ if (peerHost) {
         console.log('Connection closed');
     });
 }
+
 else {
+
+    // todo: dynamically create a port number
+    // todo: pass in an arguement to keep track of the peerid
     var server = net.createServer();
 
     server.listen(PORT, HOST);
     peersCount += 1;
     console.log(`This peer address is ${HOST}:${PORT} located at p${peersCount}`);
     server.on('connection', function (sock) {
-        peerId = `p${peersCount}:${server.address().port}`;
-        console.log(`Connected from peer ${sock.remoteAddress}:${sock.remotePort}`)
-        handler.handleClientJoining(sock,server, peerTable, peerId);
+        peerId = `p${peerIndex}:${server.address().port}`;
+        console.log(`Connected from peer ${sock.remoteAddress}:${sock.remotePort}`);
+
+        handler.handleClientJoining(sock,server, peerTable, peerId, options);
         sock.on('close', function (data) {
             console.log('CLOSED: ' + sock.remoteAddress + ' ' + sock.remotePort);
         });
@@ -120,7 +145,7 @@ function makeClientServer(clientSocket) {
     clientServer.listen(clientSocket.address().port, HOST);
     clientServer.on('connection', function (sock) {
         console.log(`Connected from peer ${sock.remoteAddress}:${sock.remotePort}`);
-        handler.handleClientJoining(sock,clientServer, peerTable, peerId);
+        handler.handleClientJoining(sock,clientServer, peerTable, peerId, options);
         sock.on('close', function (data) {
             console.log('CLOSED: ' + sock.remoteAddress + ' ' + sock.remotePort);
         });

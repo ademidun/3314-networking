@@ -28,7 +28,7 @@ module.exports = {
     //--------------------------
     //getpacket: returns the entire packet
     //--------------------------
-    getPacket: function (seq_num, time_stamp, requestPayload, peerTable, socket,server, senderId) {
+    getPacket: function (seq_num, time_stamp, requestPayload, peerTable, socket,server, senderId, options={}) {
 
         let fileName = "";
         let requestPayload1 = requestPayload.readIntLE(0, 3);
@@ -93,9 +93,9 @@ module.exports = {
 
             // console.log({fileName});
             // let newBuffer = fs.readFileSync(fileName);
-
+            let maxPeers = options.maxPeers || 2
             let messageType = 1;
-            if (peerTable.length > 1) {
+            if (peerTable.length >= maxPeers) {
                 messageType = 2;
                 console.log(`Peer table full: ${socket.remoteAddress}:${socket.remotePort} redirected`);
             }
@@ -105,7 +105,7 @@ module.exports = {
             // console.log({peerTable});
 
             packetResponse.writeIntLE(messageType, 0, 1);
-            packetResponse.writeIntLE(3314, 1, 3);
+            packetResponse.writeIntLE(options.version || 3314, 1, 3);
             packetResponse.write
             (senderId, 4, 8);
             // 127.0.0.1:63986 has 15 characters, 1 byte per character, allocate 15 bytes
