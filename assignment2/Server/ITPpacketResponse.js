@@ -28,7 +28,7 @@ module.exports = {
     //--------------------------
     //getpacket: returns the entire packet
     //--------------------------
-    getPacket: function (seq_num, time_stamp, requestPayload, peerTable, socket) {
+    getPacket: function (seq_num, time_stamp, requestPayload, peerTable, socket,server, senderId) {
 
         let fileName = "";
         let requestPayload1 = requestPayload.readIntLE(0, 3);
@@ -83,6 +83,10 @@ module.exports = {
 
         */
 
+
+        // let serverAdress = server.address().address + ':' + server.address().port;
+        // console.log('Buffer.from(senderId).length', Buffer.from(senderId).length);
+
         let fullPacket = Buffer.alloc(24);
         try {
             let packetResponse = new Buffer.alloc(24);
@@ -93,30 +97,34 @@ module.exports = {
             let messageType = 1;
             if (peerTable.length > 1) {
                 messageType = 2;
+                console.log(`Peer table full: ${socket.remoteAddress}:${socket.remotePort} redirected`);
             }
             //todo peerResponse is getting double counted
 
-            console.log({peerTable});
+            // console.log({senderId});
+            // console.log({peerTable});
+
             packetResponse.writeIntLE(messageType, 0, 1);
             packetResponse.writeIntLE(3314, 1, 3);
             packetResponse.write
-            (socket.remoteAddress + ':' + socket.remotePort, 4, 4);
+            (senderId, 4, 8);
+            // 127.0.0.1:63986 has 15 characters, 1 byte per character, allocate 15 bytes
             // senderID todo: how to write string to buffer
-            packetResponse.writeIntLE(peerTable.length, 8, 4); // number of peers
+            packetResponse.writeIntLE(peerTable.length, 12, 4); // number of peers
 
             if (peerTable.length > 0) {
-                let [peerIPAddress, peerPortNumber] = peerTable[peerTable.length-1].split(':');
+                let [peerIPAddress, peerPortNumber] = peerTable[0].split(':');
                 peerPortNumber = parseInt(peerPortNumber);
 
 
-                console.log({peerIPAddress});
-                console.log({peerPortNumber});
+                // console.log({peerIPAddress});
+                // console.log({peerPortNumber});
 
-                packetResponse.writeIntLE(peerPortNumber, 12, 4); // peer port number
+                packetResponse.writeIntLE(peerPortNumber, 16, 4); // peer port number
                 // port number is 52917, we need 4 bytes (not 2) to store that
                 // else: RangeError [ERR_OUT_OF_RANGE]: The value of "value" is out of range.
                 // It must be >= -32768 and <= 32767. Received 52917
-                packetResponse.writeIntLE(peerIPAddress, 16, 4); // peer ip adress
+                packetResponse.write(peerIPAddress, 20, 4); // peer ip address
             }
 
             fullPacket = Buffer.concat([packetResponse]);

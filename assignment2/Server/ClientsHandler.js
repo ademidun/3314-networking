@@ -6,14 +6,13 @@ var ITPpacket = require('./ITPpacketResponse'),
 
 module.exports = {
 
-    handleClientJoining: function (sock,peerTable, redirect=false) {
+    handleClientJoining: function (sock,server,peerTable,peerId, redirect=false) {
 
-        console.log('Connected from peer ' + sock.remoteAddress + ':' + sock.remotePort);
         sock.on('data', data => {
 
             if (peerTable.length >= 2 && !redirect) {
                 console.log('about to redirect...')
-                this.handleClientJoining(sock,true);
+                this.handleClientJoining(sock, server, peerTable,peerId, true);
             }
             readRespond(data, peerTable);
             if (peerTable.length < 2) {
@@ -27,8 +26,8 @@ module.exports = {
 
         function readRespond(data, peerTable) {
             // process the response from the cleint and prepare a response using our ITPpacket.
-            console.log('DATA: ' + sock.remoteAddress + ': ' + data);
-            sock.write(ITPpacket.getPacket(singleton.getSequenceNumber(), singleton.getTimestamp(), data, peerTable, sock));
+            // console.log('DATA: ' + sock.remoteAddress + ': ' + data);
+            sock.write(ITPpacket.getPacket(singleton.getSequenceNumber(), singleton.getTimestamp(), data, peerTable, sock,server, peerId));
         }
 
         //
