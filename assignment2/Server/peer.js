@@ -28,8 +28,19 @@ let peerIndex = args['i'];
 let maxPeers = parseInt(args['n']);
 let version = parseInt(args['v']);
 
+
+
+// parse the arguements used to specify the image we are querying
+let peerHost = args['p'];
+
 if (!peerIndex) {
-    peerIndex = 1
+    if (!peerHost) {
+        peerIndex = 1;
+    }
+    else {
+        peerIndex = Math.floor(Math.random() * (20 - 1) ) + 1;
+    }
+
 }
 
 peerIndex = parseInt(peerIndex);
@@ -41,8 +52,6 @@ let options = {
 
 console.log({options});
 
-// parse the arguements used to specify the image we are querying
-let peerHost = args['p'];
 if (peerHost) {
 
     console.log({peerHost});
