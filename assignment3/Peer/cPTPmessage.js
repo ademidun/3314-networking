@@ -10,8 +10,8 @@ module.exports = {
 
     init: function(msgType, sender, peerTable) {
         let noOfPeers = Object.keys(peerTable).length,
-        port = peerTable[1].port,
-        peerIP = peerTable[1].IP;
+            port = peerTable[1].port,
+            peerIP = peerTable[1].IP;
 
         //fill by default header fields:
         version = 3314;
@@ -34,7 +34,7 @@ module.exports = {
         let v3 = version << 24;
         this.message[2] = (v3 >>> (24));
 
-       this.message[3] = (messageType);
+        this.message[3] = (messageType);
         //second 4 bytes
         let senderBytes = stringToBytes(sender); // should be within 4 bytes
         for (var i = 4; i < 8; i++) {
@@ -52,8 +52,7 @@ module.exports = {
 
         // if number of peer not zero
         if (noOfPeers > 0) {
-
-            for (let i=0; i< noOfPeers; i++) {
+            for (let i=0; i< 1; i++) {
 
                 port = peerTable[1+i].port;
                 peerIP = peerTable[1+i].IP;
