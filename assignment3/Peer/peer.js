@@ -1,6 +1,7 @@
 let net = require('net'),
     singleton = require('./Singleton'),
     handler = require('./PeersHandler');
+let peer2peerDB = require('./peer2peerDB');
 
 singleton.init();
 
@@ -64,6 +65,8 @@ if (process.argv.length > 2) {
         // received connection request
         handler.handleClientJoining(sock, maxpeers, peerLocation, peerTable);
     });
+
+    peer2peerDB.startServerImageDB();
 }
 
 
