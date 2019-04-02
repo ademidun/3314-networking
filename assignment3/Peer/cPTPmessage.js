@@ -23,7 +23,6 @@ module.exports = {
         //--------------------------
 
         HEADER_SIZE = ( (noOfPeers-1) * 8) + HEADER_SIZE;
-        console.log({HEADER_SIZE});
         this.message = new Buffer.alloc(HEADER_SIZE);
 
         console.log({peerTable});

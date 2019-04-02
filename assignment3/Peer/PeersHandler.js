@@ -1,12 +1,13 @@
 let net = require('net'),
     cPTPpacket = require('./cPTPmessage'),
     singleton = require('./Singleton');
-
+let ITPpacket = require('../Client/ITPpacketRequest')
 let peerTable = {},
     firstPeerIP = {},
     firstPeerPort = {},
     isFull = {};
-
+let peerTableDeclined = {};
+let peerTableMessage = {};
 
 module.exports = {
     handleClientJoining: function (sock, maxPeers, sender, peerTable) {
@@ -33,6 +34,8 @@ module.exports = {
                 + bytes2number(message.slice(18, 19)) + '.'
                 + bytes2number(message.slice(19, 20));
 
+            peerTableMessage = message;
+
             if (msgType == 1) {
                 isFull[client.remotePort] = false;
                 console.log("Connected to peer " + sender + ":" + client.remotePort + " at timestamp: " + singleton.getTimestamp());
@@ -44,7 +47,8 @@ module.exports = {
                 // Now run as a server
                 let serverPeer = net.createServer();
                 serverPeer.listen(client.localPort, client.localAddress);
-                console.log('This peer address is ' + client.localAddress + ':' + client.localPort + ' located at ' + location);
+                // console.log('This peer address is ' + client.localAddress + ':' + client.localPort + ' located at ' + location);
+                console.log('This peer address is ' + client.localAddress + ':' + client.localPort);
                 serverPeer.on('connection', function (sock) {
 
                     console.log({maxPeers});
@@ -73,13 +77,21 @@ module.exports = {
             } else {
                 console.log("Received ack from " + sender + ":" + client.remotePort);
                 isFull[client.remotePort] = true;
-                if (numberOfPeers > 0)
-                    displayPeerTable(message)
+                if (numberOfPeers > 0);
+                    displayPeerTable(message);
+                    try {
+                        autoJoin(client, peerTableMessage, peerTable, maxPeers);
+                    } catch (err) {
+                        console.log('autoJoin err', err);
+                    }
                 console.log("Join redirected, try to connect to the peer above.");
+
             }
         });
         client.on('end', () => {
-            if (isFull[client.remotePort]) process.exit();
+            if (isFull[client.remotePort]) {
+
+            }; //process.exit();
         });
 
     },
@@ -87,18 +99,74 @@ module.exports = {
 
 };
 
+function autoJoin(client, message, peerTable, maxPeers) {
+
+    // reconnect to the next peer returned in a list from the server
+    console.log('autoJoin()');
+    client.destroy();
+
+    let peersCount = Object.keys(peerTable).length;
+
+    if (peersCount >= maxPeers) {
+        console.log('autoJoin finished, peer table is full');
+        return
+    }
+    console.log({peerTableDeclined});
+
+    if (! (client.remotePort in peerTableDeclined)) {
+
+        // track the peers that have been declined
+        peerTableDeclined[client.remotePort] = {IP: client.remoteAddress, port: client.remotePort};
+        let numberOfPeers = bytes2number(message.slice(8, 12)); //for some reason changing from 12 to 11 worked
+
+        console.log({numberOfPeers});
+
+        for (let i=0; i< numberOfPeers; i++) {
+
+            let peerPortTemp = bytes2number(message.slice(14+8*i, 16+8*i));
+            let peerIPTemp = bytes2number(message.slice(16+8*i, 17+8*i)) + '.'
+                + bytes2number(message.slice(17+8*i, 18+8*i)) + '.'
+                + bytes2number(message.slice(18+8*i, 19+8*i)) + '.'
+                + bytes2number(message.slice(19+8*i, 20+8*i));
+
+            // create new socket for autoJoin
+            // let clientPeer = new net.Socket();
+
+            if (! (peerPortTemp in peerTableDeclined)) {
+                let clientPeer = new net.Socket();
+
+                clientPeer.connect(peerPortTemp, peerIPTemp, function (socket) {
+                // initialize peer table
+                let path = __dirname.split("\\");
+                let peerLocation = path[path.length - 1];
+
+                clientPeer.write(ITPpacket.getpacket());
+                module.exports.handleCommunications(clientPeer, maxPeers, peerLocation, peerTable);
+
+                console.log('autJoin() peerTable');
+                console.log({peerTable})
+            });
+                break;
+            }
+        }
+
+    }
+}
+
 function displayPeerTable (message) {
     let msgType = bytes2number(message.slice(3, 4));
     let sender = bytes2string(message.slice(4, 8));
     let numberOfPeers = bytes2number(message.slice(8, 12)); //for some reason changing from 12 to 11 worked
 
     for (let i=0; i< numberOfPeers; i++) {
+        /*
         if (i==0) {
             console.log({i});
             console.log({msgType});
             console.log({sender});
             console.log({numberOfPeers});
         }
+        */
 
         let peerPortTemp = bytes2number(message.slice(14+8*i, 16+8*i));
         let peerIPTemp = bytes2number(message.slice(16+8*i, 17+8*i)) + '.'

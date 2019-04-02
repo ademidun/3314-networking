@@ -55,7 +55,8 @@ if (process.argv.length > 2) {
     // run as a server
     let serverPeer = net.createServer();
     serverPeer.listen(PORT, HOST);
-    console.log('This peer address is ' + HOST + ':' + PORT + ' located at ' + peerLocation);
+    // console.log('This peer address is ' + HOST + ':' + PORT + ' located at ' + peerLocation);
+    console.log('This peer address is ' + HOST + ':' + PORT);
 
     // initialize peer table
     let peerTable = {};
