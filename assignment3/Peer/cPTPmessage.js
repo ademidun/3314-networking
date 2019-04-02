@@ -23,7 +23,10 @@ module.exports = {
         //--------------------------
 
         HEADER_SIZE = ( (noOfPeers-1) * 8) + HEADER_SIZE;
+        console.log({HEADER_SIZE});
         this.message = new Buffer.alloc(HEADER_SIZE);
+
+        console.log({peerTable});
 
         //fill the header array of bytes
         // first 4 bytes
@@ -52,7 +55,7 @@ module.exports = {
 
         // if number of peer not zero
         if (noOfPeers > 0) {
-            for (let i=0; i< 1; i++) {
+            for (let i=0; i< noOfPeers; i++) {
 
                 port = peerTable[1+i].port;
                 peerIP = peerTable[1+i].IP;

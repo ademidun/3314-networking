@@ -46,8 +46,12 @@ module.exports = {
                 serverPeer.listen(client.localPort, client.localAddress);
                 console.log('This peer address is ' + client.localAddress + ':' + client.localPort + ' located at ' + location);
                 serverPeer.on('connection', function (sock) {
+
+                    console.log({maxPeers});
+                    console.log({peerTable});
+
                     let peersCount = Object.keys(peerTable).length;
-                    if (peersCount === maxPeers) {
+                    if (peersCount == maxPeers) {
                         declineClient(sock, location, peerTable);
                     } else {
                         handleClient(sock, location, peerTable)
@@ -56,14 +60,21 @@ module.exports = {
 
                 console.log("Received ack from " + sender + ":" + client.remotePort);
                 if ((numberOfPeers > 0) && (client.localPort != peerPort)) {
-                    console.log("  which is peered with: " + peerIP + ":" + peerPort);
+
+                    if (client.remotePort == 3000) {
+                        console.log("  which is peered with: " + peerIP + ":" + peerPort);
+                    }
+                    else {
+                        console.log('client.remotePort', client.remotePort);
+                        displayPeerTable(message)
+                    }
                 }
 
             } else {
                 console.log("Received ack from " + sender + ":" + client.remotePort);
                 isFull[client.remotePort] = true;
                 if (numberOfPeers > 0)
-                    console.log("  which is peered with: " + peerIP + ":" + peerPort);
+                    displayPeerTable(message)
                 console.log("Join redirected, try to connect to the peer above.");
             }
         });
@@ -71,8 +82,35 @@ module.exports = {
             if (isFull[client.remotePort]) process.exit();
         });
 
-    }
+    },
+
+
 };
+
+function displayPeerTable (message) {
+    let msgType = bytes2number(message.slice(3, 4));
+    let sender = bytes2string(message.slice(4, 8));
+    let numberOfPeers = bytes2number(message.slice(8, 12)); //for some reason changing from 12 to 11 worked
+
+    for (let i=0; i< numberOfPeers; i++) {
+        if (i==0) {
+            console.log({i});
+            console.log({msgType});
+            console.log({sender});
+            console.log({numberOfPeers});
+        }
+
+        let peerPortTemp = bytes2number(message.slice(14+8*i, 16+8*i));
+        let peerIPTemp = bytes2number(message.slice(16+8*i, 17+8*i)) + '.'
+            + bytes2number(message.slice(17+8*i, 18+8*i)) + '.'
+            + bytes2number(message.slice(18+8*i, 19+8*i)) + '.'
+            + bytes2number(message.slice(19+8*i, 20+8*i));
+
+        let prefix = i===0 ? "  which is peered with" : "  and"
+        console.log(prefix+": " + peerIPTemp + ":" + peerPortTemp);
+    }
+}
+
 
 function handleClient(sock, sender, peerTable) {
     // accept client request
