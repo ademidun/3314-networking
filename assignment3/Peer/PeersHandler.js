@@ -46,6 +46,8 @@ module.exports = {
                 serverPeer.listen(client.localPort, client.localAddress);
                 console.log('This peer address is ' + client.localAddress + ':' + client.localPort + ' located at ' + location);
                 serverPeer.on('connection', function (sock) {
+
+
                     let peersCount = Object.keys(peerTable).length;
                     if (peersCount === maxPeers) {
                         declineClient(sock, location, peerTable);
@@ -94,9 +96,14 @@ function declineClient(sock, sender, peerTable) {
 }
 
 function addClient(sock, peerTable) {
-    let peersCount = Object.keys(peerTable).length;
-    let joiningPeer = {'port': sock.remotePort, 'IP': sock.remoteAddress};
-    peerTable[++peersCount] = joiningPeer;
+
+    // add new client to the peer table
+    let peerCount = Object.keys(peerTable).length
+
+    let receiverPeer = {'port': client.remotePort, 'IP': client.remoteAddress};
+    peerTable[peerCount+1] = receiverPeer;
+
+    console.log('receiverPeer', receiverPeer);
 
     let peerAddress = sock.remoteAddress + ':' + sock.remotePort;
     console.log('\nConnected from peer ' + peerAddress);

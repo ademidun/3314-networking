@@ -7,12 +7,12 @@ var nickNames = {},
     startTimestamp = {};
 
 module.exports = {
-    handleClientJoining: function (sock) {
+    handleClientJoining: function (sock, opts) {
         assignClientName(sock, nickNames);
         const chunks = [];
         console.log('\n' + nickNames[sock.id] + ' is connected at timestamp: ' + startTimestamp[sock.id]);
         sock.on('data', function (requestPacket) {
-            handleClientRequests(requestPacket, sock); //read client requests and respond
+            handleClientRequests(requestPacket, sock, opts); //read client requests and respond
 
         });
         sock.on('close', function () {
@@ -21,7 +21,7 @@ module.exports = {
     }
 };
 
-function handleClientRequests(data, sock) {
+function handleClientRequests(data, sock, options={}) {
     let version = bytes2number(data.slice(0, 3));
     let requestType = bytes2number(data.slice(3, 4));
     let imageFilename = bytes2string(data.slice(4));
@@ -41,6 +41,10 @@ function handleClientRequests(data, sock) {
 
             infile.on('close', function () {
                 let image = Buffer.concat(imageChunks);
+                let resType = 1;
+                if (options.peersCount && options.peersCount >= 2) {
+
+                }
                 ITPpacket.init(1, singleton.getSequenceNumber(), singleton.getTimestamp(), image, image.length);
                 sock.write(ITPpacket.getPacket());
                 sock.end();

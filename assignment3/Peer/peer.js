@@ -9,6 +9,8 @@ let ifaces = os.networkInterfaces();
 let HOST = '';
 let PORT = singleton.getPort(); //get random port number
 let maxpeers = 2;
+let ITPpacket = require('../Client/ITPpacketRequest')
+ITPpacket.init('Swan.jpg');
 
 // get the loaclhost ip address
 Object.keys(ifaces).forEach(function (ifname) {
@@ -28,7 +30,7 @@ if (process.argv.length > 2) {
 
     // run as a client
     // this needs more work to properly filter command line arguments
-    console.log('process.argv', process.argv)
+    console.log('running as a client');
     let firstFlag = process.argv[2]; // should be -p
     let hostserverIPandPort = process.argv[3].split(':');
     let secondFlag = process.argv[4]; // should be -n
@@ -43,9 +45,11 @@ if (process.argv.length > 2) {
     clientPeer.connect(knownPORT, knownHOST, function () {
         // initialize peer table
         let peerTable = {};
+        clientPeer.write(ITPpacket.getpacket());
         handler.handleCommunications(clientPeer, maxpeers, peerLocation, peerTable);
     });
 } else {
+    console.log('running as a server');
     // call as node peer
 
     // run as a server

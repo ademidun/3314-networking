@@ -21,6 +21,8 @@ module.exports = {
 
         //build the header bistream:
         //--------------------------
+
+        HEADER_SIZE = ( (noOfPeers-1) * 8) + HEADER_SIZE;
         this.message = new Buffer.alloc(HEADER_SIZE);
 
         //fill the header array of bytes
@@ -50,22 +52,29 @@ module.exports = {
 
         // if number of peer not zero
         if (noOfPeers > 0) {
-        // fourth 4 bytes
-            // 2 bytes reserved
-            this.message[12] ='' ;
-            this.message[13] ='' ;
-            // 2 bytes peer port
-            let p1 = port << 16;
-            this.message[14] = (p1 >>> 24) ;
-            let p2 = port << 24;
-            this.message[15] = (p2 >>> 24);
 
-        // fifth 4 bytes
-            let IP = peerIP.split('.');
-            this.message[16] = IP[0];
-            this.message[17] = IP[1];
-            this.message[18] = IP[2];
-            this.message[19] = IP[3];
+            for (let i=0; i< noOfPeers; i++) {
+
+                port = peerTable[1+i].port;
+                peerIP = peerTable[1+i].IP;
+
+                // fourth 4 bytes
+                // 2 bytes reserved
+                this.message[12+8*i] ='' ;
+                this.message[13+8*i] ='' ;
+                // 2 bytes peer port
+                let p1 = port << 16;
+                this.message[14+8*i] = (p1 >>> 24) ;
+                let p2 = port << 24;
+                this.message[15+8*i] = (p2 >>> 24);
+
+                // fifth 4 bytes
+                let IP = peerIP.split('.');
+                this.message[16+8*i] = IP[0];
+                this.message[17+8*i] = IP[1];
+                this.message[18+8*i] = IP[2];
+                this.message[19+8*i] = IP[3];
+            }
         }
     },
 
