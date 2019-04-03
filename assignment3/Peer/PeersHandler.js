@@ -41,8 +41,13 @@ module.exports = {
                 console.log("Connected to peer " + sender + ":" + client.remotePort + " at timestamp: " + singleton.getTimestamp());
 
                 // add the server (the receiver request) into the table
+                console.log('peerTable Before');
+                console.log({peerTable});
                 let receiverPeer = {'port': client.remotePort, 'IP': client.remoteAddress};
-                peerTable[1] = receiverPeer;
+                let peersCount = Object.keys(peerTable).length;
+                peerTable[peersCount+1] = receiverPeer;
+                console.log('peerTable after');
+                console.log({peerTable});
 
                 // Now run as a server
                 let serverPeer = net.createServer();
