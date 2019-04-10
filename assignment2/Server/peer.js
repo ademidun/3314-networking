@@ -137,7 +137,7 @@ else {
         peerId = `p${peerIndex}:${server.address().port}`;
         console.log(`Connected from peer ${sock.remoteAddress}:${sock.remotePort}`);
 
-        handler.handleClientJoining(sock,server, peerTable, peerId, options);
+        handler.handleClientJoining(sock,server, peerTable, peerId, false, options);
         sock.on('close', function (data) {
             console.log('CLOSED: ' + sock.remoteAddress + ' ' + sock.remotePort);
         });
@@ -154,7 +154,7 @@ function makeClientServer(clientSocket) {
     clientServer.listen(clientSocket.address().port, HOST);
     clientServer.on('connection', function (sock) {
         console.log(`Connected from peer ${sock.remoteAddress}:${sock.remotePort}`);
-        handler.handleClientJoining(sock,clientServer, peerTable, peerId, options);
+        handler.handleClientJoining(sock,clientServer, peerTable, peerId, false, options);
         sock.on('close', function (data) {
             console.log('CLOSED: ' + sock.remoteAddress + ' ' + sock.remotePort);
         });
