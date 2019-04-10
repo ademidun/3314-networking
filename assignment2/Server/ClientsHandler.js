@@ -9,8 +9,6 @@ module.exports = {
     handleClientJoining: function (sock,server,peerTable,peerId, redirect=false, options={}) {
 
         sock.on('data', data => {
-            console.log({peerTable});
-            console.log({options});
             if (peerTable.length >= options.maxPeers && !redirect) {
                 console.log('about to redirect...')
                 this.handleClientJoining(sock, server, peerTable,peerId, true, options);
@@ -19,6 +17,8 @@ module.exports = {
             if (peerTable.length < options.maxPeers) {
                 peerTable.push( sock.remoteAddress + ':' + sock.remotePort);
             }
+
+            console.log({peerTable});
         });
 
         sock.on('close', function (data) {
